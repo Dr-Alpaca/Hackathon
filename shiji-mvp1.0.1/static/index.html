@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食荐 - 不知道吃什么？让我帮你选</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: -16px -16px 16px -16px;
+            padding: 24px 16px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .recommendation-card {
+            position: relative;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .location {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .shop-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .dish-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        .quote {
+            font-size: 16px;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            border-left: 3px solid #667eea;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            color: #555;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+        }
+
+        .dish-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .dish-image.show {
+            display: block;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+
+        .btn-outline:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-like {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-like:hover {
+            border-color: #667eea;
+        }
+
+        .btn-like.active {
+            background: #fff0f0;
+            border-color: #ff4757;
+            color: #ff4757;
+        }
+
+        .post-form {
+        }
+
+        .form-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-group input[type="file"] {
+            display: block;
+            margin-top: 8px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state p {
+            margin-bottom: 16px;
+        }
+
+        .shop-detail {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .shop-detail.show {
+            display: block;
+        }
+
+        .detail-header {
+            background: #667eea;
+            color: white;
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+
+        .detail-content {
+            padding: 16px;
+        }
+
+        .post-item {
+            border-bottom: 1px solid #eee;
+            padding: 16px 0;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+        }
+
+        .post-text {
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .post-images {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .post-images img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1px dashed #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .refresh-btn:hover {
+            background: #f8f5ff;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .fab:hover {
+            background: #5568d3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .contrast-info {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>校园食荐</h1>
+            <p>不知道吃什么？滑动刷新获取推荐 ✨</p>
+        </header>
+
+        <button class="refresh-btn" id="refreshBtn">🔄 刷新推荐</button>
+
+        <div id="recommendations">
+            <div class="loading">加载中...</div>
+        </div>
+
+        <div class="card">
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <p>😋 还没有人分享推荐</p>
+                <p>快来发布第一条推荐吧！</p>
+            </div>
+            <div class="empty-state" id="endOfList" style="display: none;">
+                <p>这些都是精选过的，再看看？</p>
+                <p>没有你想吃的？去发帖告诉大家 👇</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab" id="openPostModal">➕</button>
+
+    <!-- 店铺详情弹窗 -->
+    <div class="shop-detail" id="shopDetail">
+        <div class="detail-header">
+            <button class="back-btn" id="backFromDetail">←</button>
+            <div>
+                <h2 id="detailShopName"></h2>
+                <p id="detailCanteen" style="opacity: 0.9; font-size: 14px;"></p>
+            </div>
+        </div>
+        <div class="detail-content" id="detailContent">
+        </div>
+    </div>
+
+    <!-- 发帖弹窗 -->
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">发布新推荐</div>
+                <button class="close-btn" id="closePostModal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="postForm">
+                    <div class="form-group">
+                        <label>说说你的用餐体验</label>
+                        <textarea name="text" id="postText" placeholder="例如：一食堂三楼7号窗口，铁板黑椒鸡排饭真的绝了！鸡排是现煎的..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>添加图片（可选）</label>
+                        <input type="file" id="postImages" multiple accept="image/*">
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelPost">取消</button>
+                        <button type="submit" class="btn btn-primary">发布</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取或生成deviceId
+        let deviceId = localStorage.getItem('device_id');
+        if (!deviceId) {
+            deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('device_id', deviceId);
+        }
+
+        const API_BASE = '';
+
+        // 元素
+        const recommendationsEl = document.getElementById('recommendations');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const emptyState = document.getElementById('emptyState');
+        const endOfList = document.getElementById('endOfList');
+        const openPostModal = document.getElementById('openPostModal');
+        const postModal = document.getElementById('postModal');
+        const closePostModal = document.getElementById('closePostModal');
+        const cancelPost = document.getElementById('cancelPost');
+        const postForm = document.getElementById('postForm');
+        const shopDetail = document.getElementById('shopDetail');
+        const backFromDetail = document.getElementById('backFromDetail');
+        const detailContent = document.getElementById('detailContent');
+        const detailShopName = document.getElementById('detailShopName');
+        const detailCanteen = document.getElementById('detailCanteen');
+
+        // 加载推荐
+        async function loadRecommendations() {
+            recommendationsEl.innerHTML = '<div class="loading">加载中...</div>';
+            emptyState.style.display = 'none';
+            endOfList.style.display = 'none';
+
+            try {
+                const res = await fetch(API_BASE + '/api/recommendations');
+                const result = await res.json();
+
+                if (result.code !== 0) {
+                    recommendationsEl.innerHTML = `<div class="empty-state">加载失败: ${result.message}</div>`;
+                    return;
+                }
+
+                const posts = result.data || [];
+
+                if (posts.length === 0) {
+                    emptyState.style.display = 'block';
+                    recommendationsEl.innerHTML = '';
+                    return;
+                }
+
+                recommendationsEl.innerHTML = '';
+
+                posts.forEach(post => {
+                    const card = createRecommendationCard(post);
+                    recommendationsEl.appendChild(card);
+                });
+
+                if (!result.meta.has_more) {
+                    endOfList.style.display = 'block';
+                }
+            } catch (e) {
+                console.error(e);
+                recommendationsEl.innerHTML = `<div class="empty-state">网络错误: ${e.message}</div>`;
+            }
+        }
+
+        // 创建推荐卡片
+        function createRecommendationCard(post) {
+            const card = document.createElement('div');
+            card.className = 'card recommendation-card';
+
+            let imageHtml = '';
+            if (post.image_url) {
+                imageHtml = `<img src="${post.image_url}" class="dish-image show" alt="${post.dish_name}">`;
+            }
+
+            let tagsHtml = '';
+            if (post.tags && post.tags.length > 0) {
+                tagsHtml = '<div class="tags">' + post.tags.map(tag => `<span class="tag">${tag}</span>`).join('') + '</div>';
+            }
+
+            let quoteHtml = '';
+            if (post.quote) {
+                quoteHtml = `<div class="quote">"${post.quote}"</div>`;
+            }
+
+            card.innerHTML = `
+                ${imageHtml}
+                <div class="card-header">
+                    <div>
+                        <div class="location">${post.canteen}</div>
+                        <div class="shop-name">${post.shop_name}</div>
+                    </div>
+                </div>
+                <div class="dish-name">${post.dish_name}</div>
+                ${quoteHtml}
+                ${tagsHtml}
+                <div class="card-footer">
+                    <button class="btn btn-outline" onclick="openShopDetail(${post.shop_id})">查看详情</button>
+                    <button class="btn-like" data-post-id="${post.id}" onclick="toggleLike(this, ${post.id})">
+                        🤍 我想吃
+                    </button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // 打开店铺详情
+        async function openShopDetail(shopId) {
+            shopDetail.classList.add('show');
+            detailContent.innerHTML = '<div class="loading">加载中...</div>';
+
+            try {
+                const res = await fetch(API_BASE + `/api/shops/${shopId}`);
+                const result = await res.json();
+
+                if (result.code !== 0) {
+                    detailContent.innerHTML = `<div class="empty-state">加载失败: ${result.message}</div>`;
+                    return;
+                }
+
+                const data = result.data;
+                detailShopName.textContent = `${data.shop.name}`;
+                detailCanteen.textContent = data.shop.canteen;
+
+                detailContent.innerHTML = '';
+
+                data.posts.forEach(post => {
+                    const item = document.createElement('div');
+                    item.className = 'post-item';
+
+                    let imagesHtml = '';
+                    if (post.images && post.images.length > 0) {
+                        imagesHtml = '<div class="post-images">' +
+                            post.images.map(img => `<img src="${img}" alt="图片">`).join('') +
+                            '</div>';
+                    }
+
+                    let tagsHtml = '';
+                    if (post.tags && post.tags.length > 0) {
+                        tagsHtml = '<div class="tags" style="margin-top: 8px;">' +
+                            post.tags.map(tag => `<span class="tag">${tag}</span>`).join('') +
+                            '</div>';
+                    }
+
+                    let quoteHtml = '';
+                    if (post.quote) {
+                        quoteHtml = `<div class="quote" style="margin: 8px 0;">"${post.quote}"</div>`;
+                    }
+
+                    item.innerHTML = `
+                        <div class="post-text">${post.text}</div>
+                        ${quoteHtml}
+                        ${imagesHtml}
+                        ${tagsHtml}
+                    `;
+                    detailContent.appendChild(item);
+                });
+
+            } catch (e) {
+                console.error(e);
+                detailContent.innerHTML = `<div class="empty-state">网络错误: ${e.message}</div>`;
+            }
+        }
+
+        // "我想吃" 点击
+        async function toggleLike(btn, postId) {
+            if (btn.classList.contains('active')) {
+                return;
+            }
+
+            try {
+                await fetch(API_BASE + '/api/actions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        device_id: deviceId,
+                        target_type: 'post',
+                        target_id: postId,
+                        action_type: 'i_want_eat'
+                    })
+                });
+
+                btn.classList.add('active');
+                btn.innerHTML = '❤️ 我想吃';
+            } catch (e) {
+                console.error(e);
+                alert('操作失败，请重试');
+            }
+        }
+
+        // 发帖
+        async function submitPost(e) {
+            e.preventDefault();
+
+            const text = document.getElementById('postText').value;
+            const files = document.getElementById('postImages').files;
+
+            if (!text.trim() || text.length < 3) {
+                alert('请输入至少3个字符');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('text', text);
+            formData.append('device_id', deviceId);
+
+            for (let i = 0; i < files.length; i++) {
+                formData.append('images', files[i]);
+            }
+
+            try {
+                const res = await fetch(API_BASE + '/api/posts', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await res.json();
+
+                if (result.code !== 0) {
+                    alert(`发布失败: ${result.message}`);
+                    return;
+                }
+
+                alert('发布成功！');
+                postModal.classList.remove('show');
+                postForm.reset();
+                loadRecommendations();
+            } catch (e) {
+                console.error(e);
+                alert('网络错误');
+            }
+        }
+
+        // 事件绑定
+        refreshBtn.addEventListener('click', loadRecommendations);
+        openPostModal.addEventListener('click', () => postModal.classList.add('show'));
+        closePostModal.addEventListener('click', () => postModal.classList.remove('show'));
+        cancelPost.addEventListener('click', () => postModal.classList.remove('show'));
+        postForm.addEventListener('submit', submitPost);
+        backFromDetail.addEventListener('click', () => shopDetail.classList.remove('show'));
+
+        // 点击蒙层关闭弹窗
+        postModal.addEventListener('click', (e) => {
+            if (e.target === postModal) {
+                postModal.classList.remove('show');
+            }
+        });
+
+        // 初始加载
+        loadRecommendations();
+    </script>
+</body>
+</html>

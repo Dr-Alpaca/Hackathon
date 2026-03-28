@@ -1,0 +1,72 @@
+你是一个资深Flask开发专家。请根据以下需求生成一个完整的Flask应用代码，实现一个简易的校园餐饮推荐系统MVP。
+
+### 技术栈
+- Flask
+- SQLite (使用SQLAlchemy ORM)
+- 文件上传使用werkzeug
+
+### 数据库模型（基于SQLAlchemy）
+根据以下SQL建表语句生成对应的Model类：
+```sql
+CREATE TABLE shops (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    canteen TEXT NOT NULL,
+    name TEXT NOT NULL,
+    location_desc TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    images TEXT,
+    shop_id INTEGER,
+    dish_name TEXT,
+    quote TEXT,
+    tags TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE actions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    device_id TEXT NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id INTEGER NOT NULL,
+    action_type TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(device_id, target_type, target_id, DATE(created_at))
+);
+```
+
+需要实现的API接口（按Flask蓝图组织）
+GET /api/recommendations
+返回最近10条posts，每个post需包含店铺信息（关联shops表），以及从post的text中提取的quote和tags（若post中已存则直接返回）。若post中未提取，则调用后面的extract_info函数实时提取并存入。
+
+POST /api/posts
+接收multipart/form-data：text, images(多个), device_id。
+保存图片到uploads/目录，文件名用时间戳+随机数，返回相对路径，多个图片用逗号拼接存入images字段。
+调用extract_info(text)获取canteen, shop_name, dish_name, quote, tags。
+根据canteen和shop_name查找或创建shops记录（若存在则使用其id）。
+将完整信息插入posts表。
+返回{code:0, data:{post_id: id}}。
+
+GET /api/shops/<int:shop_id>
+返回店铺信息及该店铺下的所有posts（按时间倒序）。
+
+POST /api/actions
+接收JSON: {device_id, target_type, target_id, action_type}，插入actions表（注意唯一约束），返回成功。
+
+图片上传要求
+上传目录：./uploads，需自动创建。
+文件名：使用uuid.uuid4().hex + ext或int(time.time()*1000) + random。
+限制文件大小：5MB。
+允许的扩展名：jpg, jpeg, png, gif。
+
+辅助函数
+实现一个extract_info(text)，暂时用简单的正则规则（可参照第5节示例），返回dict包含canteen, shop_name, dish_name, quote, tags。
+
+代码组织
+使用Flask蓝图将路由分开。
+提供if __name__ == '__main__'启动。
+添加必要的错误处理（try/except），返回统一的JSON格式：{"code": int, "message": str, "data": any}。
+
+请生成完整代码，并包含必要的注释，确保可直接运行。
