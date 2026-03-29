@@ -1,0 +1,41 @@
+你是一个全栈开发助手。请根据以下API规范，生成一个简单的HTML测试页面（包含表单和按钮），以及一组cURL测试命令，用于验证后端接口。
+
+API规范
+获取推荐列表
+GET /api/recommendations
+返回：{"code":0,"data":[{"id":1,"canteen":"一食堂三楼","shop_name":"7号窗口","dish_name":"铁板黑椒鸡排饭","quote":"鸡排是现煎的","tags":["出餐快"],"image_url":"/uploads/xxx.jpg"}]}
+
+发帖
+POST /api/posts
+Content-Type: multipart/form-data
+参数：text (string), images (file, 可选多个), device_id (string)
+返回：{"code":0,"data":{"post_id":123}}
+
+店铺详情
+GET /api/shops/{shop_id}
+返回：店铺信息及该店铺下的帖子列表
+
+上报行为
+POST /api/actions
+Content-Type: application/json
+Body: {"device_id":"xxx","target_type":"post","target_id":123,"action_type":"i_want_eat"}
+返回：{"code":0,"data":null}
+
+任务
+生成一个独立的HTML文件，包含：
+一个输入框用于填写device_id（默认从localStorage读取或随机生成）。
+一个按钮"获取推荐"，点击后调用GET /api/recommendations，将结果以卡片形式展示在页面上。
+一个表单用于发帖（文本输入框、图片上传、提交按钮），提交时自动携带device_id。
+一个区域展示店铺详情（可手动输入店铺ID，点击查询）。
+一个简单的行为上报演示（例如在推荐卡片上增加"我想吃"按钮，点击后上报）。
+页面样式简洁，使用flex布局。
+
+生成一组cURL命令示例：
+获取推荐列表
+发帖（带图片，假设图片路径为./test.jpg）
+查询店铺详情
+上报行为
+
+每个命令添加注释说明。
+
+请直接输出代码（HTML和cURL）并确保可直接复制使用。

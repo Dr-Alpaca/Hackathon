@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>校园食荐 - 3D地图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        #header h1 {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        #header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        #controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .control-btn {
+            display: block;
+            width: 100%;
+            padding: 10px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .control-btn.secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        #info-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            max-width: 350px;
+            display: none;
+        }
+        
+        #info-panel.active {
+            display: block;
+        }
+        
+        #info-panel h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        #info-panel .detail {
+            color: #666;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        
+        #info-panel .tags {
+            margin-top: 10px;
+        }
+        
+        #info-panel .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 3px;
+        }
+        
+        #back-btn {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px 30px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        #back-btn:hover {
+            transform: translateX(-50%) translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 200;
+            text-align: center;
+            color: white;
+        }
+        
+        #loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        #stats {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            font-size: 13px;
+            color: #666;
+        }
+        
+        #stats div {
+            margin: 5px 0;
+        }
+        
+        #stats span {
+            font-weight: 600;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p>正在加载3D地图...</p>
+    </div>
+    
+    <div id="canvas-container"></div>
+    
+    <div id="header">
+        <h1>🗺️ 校园美食地图</h1>
+        <p>点击建筑查看餐厅详情</p>
+    </div>
+    
+    <button id="back-btn" onclick="goBack()">← 返回首页</button>
+    
+    <div id="controls">
+        <button class="control-btn primary" onclick="toggleAutoRotate()">🔄 自动旋转</button>
+        <button class="control-btn secondary" onclick="resetCamera()">🎯 重置视角</button>
+        <button class="control-btn secondary" onclick="refreshData()">🔄 刷新数据</button>
+    </div>
+    
+    <div id="info-panel">
+        <h3 id="shop-name">餐厅名称</h3>
+        <div class="detail" id="shop-canteen">📍 食堂：一食堂三楼</div>
+        <div class="detail" id="shop-dish">🍽️ 推荐菜：铁板黑椒鸡排饭</div>
+        <div class="detail" id="shop-quote">💬 "黑椒汁给得足，鸡排现煎"</div>
+        <div class="tags" id="shop-tags"></div>
+    </div>
+    
+    <div id="stats">
+        <div>🏠 食堂数量：<span id="stat-canteens">0</span></div>
+        <div>🍽️ 餐厅数量：<span id="stat-shops">0</span></div>
+        <div>📝 帖子数量：<span id="stat-posts">0</span></div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let buildings = [];
+        let selectedBuilding = null;
+        let autoRotate = true;
+        let mapData = null;
+
+        const colors = {
+            building: 0x667eea,
+            buildingHover: 0x764ba2,
+            ground: 0x2d3748,
+            accent: 0xffd700
+        };
+
+        function init() {
+            console.log('=== 3D地图初始化开始 ===');
+            
+            try {
+                const container = document.getElementById('canvas-container');
+                console.log('1. 获取容器元素:', container ? '成功' : '失败');
+                
+                if (!container) {
+                    throw new Error('找不到 canvas-container 元素');
+                }
+                
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x1a1a2e);
+                console.log('2. 场景创建成功');
+                
+                camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(30, 30, 30);
+                camera.lookAt(0, 0, 0);
+                console.log('3. 相机创建成功');
+                
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                container.appendChild(renderer.domElement);
+                console.log('4. 渲染器创建成功');
+                
+                addLights();
+                console.log('5. 灯光添加成功');
+                
+                createGround();
+                console.log('6. 地面创建成功');
+                
+                createGrid();
+                console.log('7. 网格创建成功');
+                
+                loadMapData();
+                console.log('8. 开始加载地图数据');
+                
+                window.addEventListener('resize', onWindowResize);
+                renderer.domElement.addEventListener('click', onMouseClick);
+                renderer.domElement.addEventListener('mousemove', onMouseMove);
+                
+                animate();
+                console.log('=== 3D地图初始化完成 ===');
+                
+                setTimeout(() => {
+                    const loading = document.getElementById('loading');
+                    if (loading) {
+                        loading.style.display = 'none';
+                        console.log('加载动画隐藏');
+                    }
+                }, 1000);
+            } catch (error) {
+                console.error('=== 初始化错误 ===', error);
+                alert('3D地图初始化失败: ' + error.message);
+            }
+        }
+
+        function addLights() {
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 50, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 500;
+            directionalLight.shadow.camera.left = -50;
+            directionalLight.shadow.camera.right = 50;
+            directionalLight.shadow.camera.top = 50;
+            directionalLight.shadow.camera.bottom = -50;
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0xffd700, 0.5, 100);
+            pointLight.position.set(-30, 20, -30);
+            scene.add(pointLight);
+        }
+
+        function createGround() {
+            const groundGeometry = new THREE.PlaneGeometry(80, 80);
+            const groundMaterial = new THREE.MeshStandardMaterial({ 
+                color: colors.ground,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+        }
+
+        function createGrid() {
+            const gridHelper = new THREE.GridHelper(80, 40, 0x444444, 0x333333);
+            scene.add(gridHelper);
+        }
+
+        function generateMockData() {
+            const canteens = ['一食堂', '二食堂', '三食堂', '四食堂', '五食堂'];
+            const floors = ['一楼', '二楼', '三楼', '四楼'];
+            const windows = ['1号窗口', '2号窗口', '3号窗口', '4号窗口', '5号窗口', '6号窗口', '7号窗口', '8号窗口'];
+            const dishes = ['铁板黑椒鸡排饭', '菌菇鸡汤面', '麻辣香锅', '照烧鸡腿饭', '重庆小面', '番茄牛肉饭', '烧鸭饭', '兰州拉面'];
+            const quotes = ['黑椒汁给得足，鸡排现煎', '冷天喝一口整个人都活了', '辣得很爽但分量足', '甜度刚好，会回购', '面条劲道，汤头很鲜', '番茄味浓，牛肉片实在', '皮脆肉香，蘸梅子酱一绝', '面条爽滑，牛肉汤醇厚'];
+            const tagsPool = ['出餐快', '便宜', '量大', '辣', '排队久', '好吃', '推荐', '实惠'];
+            
+            const shops = [];
+            const positions = [];
+            
+            for (let i = -3; i <= 3; i++) {
+                for (let j = -3; j <= 3; j++) {
+                    if (Math.random() > 0.4) {
+                        positions.push({ x: i * 10, z: j * 10 });
+                    }
+                }
+            }
+            
+            positions.forEach((pos, index) => {
+                const canteen = canteens[Math.floor(Math.random() * canteens.length)];
+                const floor = floors[Math.floor(Math.random() * floors.length)];
+                const window = windows[Math.floor(Math.random() * windows.length)];
+                const dish = dishes[Math.floor(Math.random() * dishes.length)];
+                const quote = quotes[Math.floor(Math.random() * quotes.length)];
+                
+                const tags = [];
+                const tagCount = Math.floor(Math.random() * 3) + 1;
+                const usedTags = new Set();
+                for (let k = 0; k < tagCount; k++) {
+                    let tag;
+                    do {
+                        tag = tagsPool[Math.floor(Math.random() * tagsPool.length)];
+                    } while (usedTags.has(tag));
+                    usedTags.add(tag);
+                    tags.push(tag);
+                }
+                
+                shops.push({
+                    id: index + 1,
+                    canteen: canteen,
+                    floor: floor,
+                    name: window,
+                    dish_name: dish,
+                    quote: quote,
+                    tags: tags,
+                    x: pos.x + (Math.random() - 0.5) * 3,
+                    z: pos.z + (Math.random() - 0.5) * 3,
+                    height: 3 + Math.random() * 8,
+                    width: 3 + Math.random() * 3,
+                    depth: 3 + Math.random() * 3,
+                    postCount: Math.floor(Math.random() * 50) + 1
+                });
+            });
+            
+            return {
+                canteens: canteens,
+                shops: shops,
+                totalPosts: shops.reduce((sum, s) => sum + s.postCount, 0)
+            };
+        }
+
+        function loadMapData() {
+            console.log('开始加载地图数据...');
+            fetch('/api/map-data')
+                .then(response => {
+                    console.log('API 响应状态:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('API 数据接收:', data);
+                    mapData = data.code === 0 ? data.data : generateMockData();
+                    console.log('使用数据:', mapData);
+                    createBuildings();
+                    updateStats();
+                })
+                .catch(error => {
+                    console.log('使用模拟数据，因为:', error);
+                    mapData = generateMockData();
+                    console.log('模拟数据:', mapData);
+                    createBuildings();
+                    updateStats();
+                });
+        }
+
+        function refreshData() {
+            mapData = generateMockData();
+            buildings.forEach(b => scene.remove(b.mesh));
+            buildings = [];
+            createBuildings();
+            updateStats();
+        }
+
+        function createBuildings() {
+            console.log('开始创建建筑...');
+            console.log('商铺数量:', mapData.shops.length);
+            
+            mapData.shops.forEach((shop, index) => {
+                const geometry = new THREE.BoxGeometry(shop.width, shop.height, shop.depth);
+                const material = new THREE.MeshStandardMaterial({
+                    color: colors.building,
+                    roughness: 0.5,
+                    metalness: 0.3
+                });
+                
+                const building = new THREE.Mesh(geometry, material);
+                building.position.set(shop.x, shop.height / 2, shop.z);
+                building.castShadow = true;
+                building.receiveShadow = true;
+                building.userData = { shop, index };
+                
+                scene.add(building);
+                buildings.push({ mesh: building, data: shop });
+                
+                addGlowEffect(building, shop);
+            });
+            
+            console.log('建筑创建完成，共', buildings.length, '个建筑');
+        }
+
+        function addGlowEffect(building, shop) {
+            const edgeGeometry = new THREE.EdgesGeometry(building.geometry);
+            const edgeMaterial = new THREE.LineBasicMaterial({ 
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.6
+            });
+            const edges = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+            edges.position.copy(building.position);
+            scene.add(edges);
+        }
+
+        function updateStats() {
+            if (mapData) {
+                document.getElementById('stat-canteens').textContent = mapData.canteens.length;
+                document.getElementById('stat-shops').textContent = mapData.shops.length;
+                document.getElementById('stat-posts').textContent = mapData.totalPosts;
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(buildings.map(b => b.mesh));
+            
+            buildings.forEach(b => {
+                b.mesh.material.color.setHex(colors.building);
+                b.mesh.scale.set(1, 1, 1);
+            });
+            
+            if (intersects.length > 0) {
+                const building = intersects[0].object;
+                building.material.color.setHex(colors.buildingHover);
+                building.scale.set(1.05, 1.05, 1.05);
+                document.body.style.cursor = 'pointer';
+            } else {
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        function onMouseClick(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(buildings.map(b => b.mesh));
+            
+            if (intersects.length > 0) {
+                const building = intersects[0].object;
+                const shop = building.userData.shop;
+                showShopInfo(shop);
+                focusOnBuilding(building);
+            }
+        }
+
+        function showShopInfo(shop) {
+            const panel = document.getElementById('info-panel');
+            document.getElementById('shop-name').textContent = `${shop.canteen} ${shop.floor} ${shop.name}`;
+            document.getElementById('shop-canteen').textContent = `📍 食堂：${shop.canteen} ${shop.floor}`;
+            document.getElementById('shop-dish').textContent = `🍽️ 推荐菜：${shop.dish_name}`;
+            document.getElementById('shop-quote').textContent = `💬 "${shop.quote}"`;
+            
+            const tagsContainer = document.getElementById('shop-tags');
+            tagsContainer.innerHTML = shop.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+            
+            panel.classList.add('active');
+        }
+
+        function focusOnBuilding(building) {
+            const targetPos = building.position.clone();
+            targetPos.y += 5;
+            
+            const startPos = camera.position.clone();
+            const endPos = new THREE.Vector3(
+                targetPos.x + 20,
+                targetPos.y + 15,
+                targetPos.z + 20
+            );
+            
+            let progress = 0;
+            const animateCamera = () => {
+                progress += 0.02;
+                if (progress <= 1) {
+                    camera.position.lerpVectors(startPos, endPos, progress);
+                    camera.lookAt(targetPos);
+                    requestAnimationFrame(animateCamera);
+                }
+            };
+            animateCamera();
+        }
+
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+        }
+
+        function resetCamera() {
+            const startPos = camera.position.clone();
+            const endPos = new THREE.Vector3(30, 30, 30);
+            const target = new THREE.Vector3(0, 0, 0);
+            
+            let progress = 0;
+            const animateCamera = () => {
+                progress += 0.02;
+                if (progress <= 1) {
+                    camera.position.lerpVectors(startPos, endPos, progress);
+                    camera.lookAt(target);
+                    requestAnimationFrame(animateCamera);
+                }
+            };
+            animateCamera();
+            
+            document.getElementById('info-panel').classList.remove('active');
+        }
+
+        let time = 0;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            time += 0.01;
+            
+            if (autoRotate) {
+                const radius = 45;
+                camera.position.x = Math.cos(time * 0.2) * radius;
+                camera.position.z = Math.sin(time * 0.2) * radius;
+                camera.position.y = 30;
+                camera.lookAt(0, 5, 0);
+            }
+            
+            buildings.forEach((b, i) => {
+                const floatOffset = Math.sin(time * 1.5 + i * 0.5) * 0.2;
+                b.mesh.position.y = b.data.height / 2 + floatOffset;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        function goBack() {
+            window.location.href = '/';
+        }
+        
+        console.log('HTML 加载完成，尝试启动初始化');
+        init();
+    </script>
+</body>
+</html>

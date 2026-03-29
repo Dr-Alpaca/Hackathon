@@ -1,0 +1,273 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#00480f",
+              "surface-tint": "#964300",
+              "primary-fixed-dim": "#e97b32",
+              "on-secondary-container": "#005e17",
+              "tertiary-fixed": "#febf2a",
+              "primary": "#964300",
+              "on-tertiary-fixed": "#3e2b00",
+              "error-dim": "#b92902",
+              "on-surface": "#2d2f2f",
+              "tertiary": "#775600",
+              "on-background": "#2d2f2f",
+              "primary-dim": "#843a00",
+              "on-secondary-fixed-variant": "#00691a",
+              "secondary-fixed-dim": "#83e881",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#573e00",
+              "outline-variant": "#acadad",
+              "secondary-container": "#91f78e",
+              "inverse-on-surface": "#9c9d9d",
+              "error": "#b02500",
+              "outline": "#767777",
+              "error-container": "#f95630",
+              "on-surface-variant": "#5a5c5c",
+              "inverse-primary": "#f9873e",
+              "primary-container": "#f9873e",
+              "tertiary-dim": "#684b00",
+              "surface-container-highest": "#dbdddd",
+              "surface-container": "#e7e8e8",
+              "on-primary": "#fff0e9",
+              "on-error": "#ffefec",
+              "secondary-fixed": "#91f78e",
+              "on-primary-fixed": "#100300",
+              "on-tertiary-fixed-variant": "#624600",
+              "surface-bright": "#f6f6f6",
+              "surface-dim": "#d3d5d5",
+              "secondary": "#006b1b",
+              "primary-fixed": "#f9873e",
+              "background": "#f6f6f6",
+              "secondary-dim": "#005d16",
+              "tertiary-container": "#febf2a",
+              "inverse-surface": "#0c0f0f",
+              "on-error-container": "#520c00",
+              "on-primary-container": "#451b00",
+              "surface-container-low": "#f0f1f1",
+              "surface-container-high": "#e1e3e3",
+              "on-secondary": "#d1ffc8",
+              "on-primary-fixed-variant": "#542200",
+              "on-tertiary": "#fff1dd",
+              "tertiary-fixed-dim": "#efb118",
+              "surface-variant": "#dbdddd",
+              "surface": "#f6f6f6"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Be Vietnam Pro"],
+              "label": ["Be Vietnam Pro"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f6f6f6;
+            color: #2d2f2f;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .sketch-shadow {
+            box-shadow: 0 12px 32px rgba(45, 47, 47, 0.06);
+        }
+        .active-nav-bg {
+            background-color: #f9873e;
+            color: white;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex min-h-screen">
+<!-- NavigationDrawer (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 px-4 z-40 bg-[#f6f6f6] dark:bg-neutral-900 w-24 md:w-64 border-r-0">
+<div class="mb-12 px-4 hidden md:block">
+<span class="font-['Plus_Jakarta_Sans'] font-extrabold text-[#964300] text-2xl tracking-tighter" style="">CampusBite</span>
+</div>
+<div class="flex flex-col gap-2">
+<!-- Home -->
+<a class="flex items-center gap-4 text-[#5a5c5c] dark:text-neutral-400 p-4 hover:bg-[#e7e8e8] dark:hover:bg-neutral-800 rounded-xl transition-all" href="/" style="">
+<span class="material-symbols-outlined" data-icon="home" style="">home</span>
+<span class="hidden md:block font-['Be_Vietnam_Pro'] text-sm font-medium uppercase tracking-widest" style="">Home</span>
+</a>
+<!-- Restaurants -->
+<a class="flex items-center gap-4 text-[#5a5c5c] dark:text-neutral-400 p-4 hover:bg-[#e7e8e8] dark:hover:bg-neutral-800 rounded-xl transition-all" href="/restaurants" style="">
+<span class="material-symbols-outlined" data-icon="restaurant" style="">restaurant</span>
+<span class="hidden md:block font-['Be_Vietnam_Pro'] text-sm font-medium uppercase tracking-widest" style="">Restaurants</span>
+</a>
+<!-- Post -->
+<a class="flex items-center gap-4 text-[#5a5c5c] dark:text-neutral-400 p-4 hover:bg-[#e7e8e8] dark:hover:bg-neutral-800 rounded-xl transition-all" href="/post" style="">
+<span class="material-symbols-outlined" data-icon="add_circle" style="">add_circle</span>
+<span class="hidden md:block font-['Be_Vietnam_Pro'] text-sm font-medium uppercase tracking-widest" style="">Post</span>
+</a>
+<!-- Profile (Active) -->
+<a class="flex items-center gap-4 bg-[#f9873e] dark:bg-[#964300] text-white rounded-xl p-4 shadow-sm scale-[0.98] duration-150" href="#" style="">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: &quot;FILL&quot; 1;">person</span>
+<span class="hidden md:block font-['Be_Vietnam_Pro'] text-sm font-medium uppercase tracking-widest" style="">Profile</span>
+</a>
+</div>
+<div class="mt-auto px-4 hidden md:block">
+<div class="p-4 bg-surface-container-low rounded-xl">
+<p class="text-xs font-bold text-on-surface-variant mb-1" style="">SKETCH PRO</p>
+<p class="text-[10px] text-on-surface-variant/70 leading-relaxed" style="">Unlock editorial layouts and custom ink brushes.</p>
+</div>
+</div>
+</nav>
+<!-- TopAppBar (Shared Component Implementation) -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[#f6f6f6]/80 dark:bg-neutral-900/80 backdrop-blur-md z-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#964300] dark:text-[#f9873e]" data-icon="menu_book" style="">menu_book</span>
+<span class="text-2xl font-black text-[#964300] dark:text-[#f9873e] italic font-['Plus_Jakarta_Sans']" style="">CampusBite</span>
+</div>
+<div class="flex gap-4 items-center">
+<button class="p-2 hover:bg-[#e7e8e8] dark:hover:bg-neutral-800 transition-colors rounded-full" style="">
+<span class="material-symbols-outlined text-[#5a5c5c]" data-icon="search" style="">search</span>
+</button>
+<button class="p-2 hover:bg-[#e7e8e8] dark:hover:bg-neutral-800 transition-colors rounded-full" style="">
+<span class="material-symbols-outlined text-[#5a5c5c]" data-icon="notifications" style="">notifications</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 bg-[#e7e8e8] dark:bg-neutral-800 h-[1px] w-full"></div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-24 md:ml-64 pt-24 pb-12 px-6 md:px-12 bg-background">
+<!-- Profile Header Section -->
+<section class="max-w-6xl mx-auto mb-16">
+<div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
+<!-- Large Circular Profile Photo -->
+<div class="relative group">
+<div class="w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden border-4 border-surface-container-lowest sketch-shadow">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="portrait of a young creative professional with short hair, warm studio lighting, neutral background, editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLcoRJ9UwfPDLAEdGNEVKb8kRKDFOoHfdvFV322lZxL_INgfHWfU_zJSts_1bi3FV0GaHu87XLCkt8M3eptphRW3JiCdV1f7W6xyILJUjfBa8sfp-nXLSeEf_Gl302uRmbLvU4Z7sic5nKVQpF3OVB4cNF_m9HdxZeZlUwiiFi81mTqEvxVkPn3h12gdBZS5vKHMCRDM2XR6amL5ykE4TjpMx6_HRec8Z-XNJZ9m8L0jcDwd095Ge4do1Mhj0y1Qt4LDytTgTH3w" style="">
+</div>
+<button class="absolute bottom-2 right-2 bg-primary p-3 rounded-full text-on-primary sketch-shadow hover:scale-105 transition-transform" style="">
+<span class="material-symbols-outlined text-lg" data-icon="edit" style="">edit</span>
+</button>
+</div>
+<!-- Profile Identity Info -->
+<div class="flex-1 text-center md:text-left">
+<div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+<h1 class="font-headline font-extrabold text-4xl md:text-5xl text-on-surface tracking-tight" style="">Alex Rivera</h1>
+<span class="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-container text-on-primary-container rounded-full font-label text-sm font-bold sketch-shadow" style="">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: &quot;FILL&quot; 1;">verified</span>
+                            12 Recommendations
+                        </span>
+</div>
+<p class="font-body text-on-surface-variant text-lg max-w-xl mb-6 leading-relaxed" style="">
+                        Design student &amp; part-time food illustrator. Mapping the best hidden ramen spots and rooftop sketches in the city. Always looking for the perfect natural light.
+                    </p>
+<div class="flex flex-wrap justify-center md:justify-start gap-8 border-t border-surface-container pt-6">
+<div class="flex flex-col">
+<span class="font-headline font-bold text-2xl text-primary" style="">1.2k</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant" style="">Followers</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-2xl text-primary" style="">840</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant" style="">Following</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline font-bold text-2xl text-primary" style="">48</span>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant" style="">Posts</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Posts Content Grid (Bento Layout Style) -->
+<section class="max-w-6xl mx-auto">
+<div class="flex items-center justify-between mb-8 border-b-2 border-surface-container-low pb-4">
+<h2 class="font-headline font-bold text-2xl text-on-surface" style="">Digital Field Notes</h2>
+<div class="flex gap-2">
+<button class="p-2 bg-surface-container-high rounded-lg text-primary" style="">
+<span class="material-symbols-outlined" data-icon="grid_view" style="">grid_view</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container transition-colors rounded-lg" style="">
+<span class="material-symbols-outlined" data-icon="list" style="">list</span>
+</button>
+</div>
+</div>
+<!-- Asymmetric Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Post 1: Large Featured -->
+<div class="md:col-span-8 group relative rounded-xl overflow-hidden bg-surface-container-lowest sketch-shadow">
+<div class="aspect-[16/10] overflow-hidden">
+<img alt="Post content" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="a beautifully presented bowl of spicy tonkotsu ramen with soft boiled egg and bamboo shoots on a dark wooden table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUNugong8nYWHDmMpAAMGrWhgRTVwFnPix40qei6DfzEj9OH5i2acL3KLoIQG-PfHXrbvYH9nSZ9lBkv875CCD_PH-gFH68LBvubB8kQm4Fmls4wTwizR2QAR5DOpAy3ddyx68GdlGNX6uKMBpbyEgWp2r-PNEDwvSOy6UlMk-jxTVmFcj5yvWOpMAcnXNJhFj-DxqDSj7f_x_37h6TfvBDdiLvVDWWsYsnuLIiviukiewHijaD7oYcqxhgXekkDBBa4sAloMQrA" style="">
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline font-bold text-2xl" style="">The Umami Secret: Ichiran Study</h3>
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide" style="">Restaurant</span>
+</div>
+<p class="font-body text-on-surface-variant mb-4" style="">Detailed breakdown of the texture and color palette found in Shibuya's narrowest ramen shop.</p>
+<div class="flex items-center gap-4 text-on-surface-variant text-sm font-medium">
+<span class="flex items-center gap-1" style=""><span class="material-symbols-outlined text-lg" data-icon="favorite" style="">favorite</span> 243</span>
+<span class="flex items-center gap-1" style=""><span class="material-symbols-outlined text-lg" data-icon="comment" style="">comment</span> 18</span>
+</div>
+</div>
+</div>
+<!-- Post 2: Tall Portrait -->
+<div class="md:col-span-4 group relative rounded-xl overflow-hidden bg-surface-container-lowest sketch-shadow">
+<div class="h-full flex flex-col">
+<div class="flex-1 overflow-hidden">
+<img alt="Post content" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="hand-drawn architectural sketch of a modern cafe storefront with watercolors, lying next to a real coffee cup" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPKrY1kuEOK7ldt9IM4vCbHbEJmnlqKoZm4YCgchOYkbo6kpegeqtBJBvkuuhW1lpycdJBgERUUXO_sE079abdTgBocyTzKDzYex3LWnCeziezTj5XhatkNMErKJlwhskqlyDM4KTFUIWDfaNw3xsjgZxkCcWxe2q6N53OI-YNJ9gOPbrfE7FtXnhJ8IAwK657ecUMnOGmGOOj6Lmu8OzOigm_aVT6BhQAgBiH7Hp48xPlzMO838eXZPzZJvvVOf5h0SIkAC7kcw" style="">
+</div>
+<div class="p-6">
+<h3 class="font-headline font-bold text-lg mb-1" style="">Cafe Sketching 101</h3>
+<p class="font-body text-sm text-on-surface-variant" style="">Morning light at The Roastery.</p>
+</div>
+</div>
+</div>
+<!-- Post 3: Small Square -->
+<div class="md:col-span-4 group relative rounded-xl overflow-hidden bg-surface-container-lowest sketch-shadow">
+<div class="aspect-square overflow-hidden">
+<img alt="Post content" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="interior of a minimalist industrial style cafe with warm ambient lighting and plants" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZuvY3GP9GMhz44LhHVc_gDcczGeY5SdkRStENMNTVr4sIy5tw-VNQ2Llt6OsAjQYd9KaPQQE0xnsRfwR-tX3hm-riWwdlqGaBOCzT7iifPXwW2jvcnEfBgZbvIzvtK6gpAz7IUD9KQMepsK_yH9h5yvvYVjNQrAbcYqP_5dT2tv52sRCe4z5jVj0mURaZJsWcmOULMFH9f2flZTi9X3zCmPtOxZVk9xC_cr2_ADAM3b9sdEw42MZQ6FDsvVGgIY9Ajf0kE7_2CQ" style="">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
+<span class="text-white font-headline font-bold text-lg" style="">Hidden Alley Gems</span>
+<div class="flex items-center gap-2 text-white/80 text-xs mt-2" style="">
+<span class="material-symbols-outlined text-sm" data-icon="location_on" style="">location_on</span> Shinjuku
+                        </div>
+</div>
+</div>
+<!-- Post 4: Medium Landscape -->
+<div class="md:col-span-8 group relative rounded-xl overflow-hidden bg-surface-container-lowest sketch-shadow">
+<div class="h-full flex flex-col md:flex-row">
+<div class="md:w-1/2 overflow-hidden">
+<img alt="Post content" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="overhead shot of a vibrant salad with grilled salmon and diverse textures of greens and seeds" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXHQa5AjldH69lispKjLUOIivjBT7OnV1YI2upuNuuUovpRhWpVyuozwfzxtu1blspUJ8ggCB5FavjaE8K1Cq12ddbr_QKvHu9m6Vz4lA97-IoSOj5bGH4vbw9Z2nqlEnUXCPueCVPzQSl6beSZQABcLIkBv9f2AzyGblppL5oU_sdPbOigHNcyQVOB4e6GMvI4ui-mLNesiJLVHxrnq021JpyJLu84IGwHX7L_pob7HZYgpYVXi1AHgQanm7voNIdfAcfl1Prkw" style="">
+</div>
+<div class="md:w-1/2 p-6 flex flex-col justify-center">
+<h3 class="font-headline font-bold text-xl mb-3" style="">Texture &amp; Health</h3>
+<p class="font-body text-on-surface-variant text-sm mb-6" style="">Why contrast is the most important element in food photography and menu design.</p>
+<div class="mt-auto">
+<button class="text-primary font-bold text-sm flex items-center gap-1 hover:gap-2 transition-all" style="">
+                                    Read Journal <span class="material-symbols-outlined text-sm" data-icon="arrow_forward" style="">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary-container text-on-primary-container rounded-full sketch-shadow flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50" style="">
+<span class="material-symbols-outlined text-3xl" data-icon="add" style="font-variation-settings: &quot;wght&quot; 600;">add</span>
+</button>
+</body></html>

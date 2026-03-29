@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>食记 — 今天吃什么</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:ital,wght@0,600;0,700;0,800;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<style>
+    :root {
+      --color-primary: #964300;
+      --color-accent: #f9873e;
+      --color-container: #e7e8e8;
+      --color-page: #f6f6f6;
+      --color-text: #2d2f2f;
+      --color-text-muted: #5a5c5c;
+      --color-success: #006b1b;
+      --font-heading: "Plus Jakarta Sans", system-ui, sans-serif;
+      --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+      --sidebar-w: 220px;
+      --radius-card: 16px;
+      --shadow-card: 0 8px 24px rgba(45, 47, 47, 0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: var(--font-body);
+      color: var(--color-text);
+      background: var(--color-page);
+      line-height: 1.5;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #fff 0%, var(--color-container) 100%);
+      border-right: 1px solid rgba(150, 67, 0, 0.12);
+      padding: 28px 16px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+      padding: 0 8px;
+    }
+
+    .sidebar-sub {
+      font-size: 0.75rem;
+      color: var(--color-text-muted);
+      padding: 0 8px 28px;
+      line-height: 1.4;
+    }
+
+    .nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-item {
+      margin-bottom: 6px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-align: left;
+    }
+
+    .nav-btn .material-symbols-outlined {
+      font-size: 22px;
+      color: var(--color-text-muted);
+    }
+
+    .nav-btn:hover {
+      background: rgba(249, 135, 62, 0.12);
+      color: var(--color-primary);
+    }
+
+    .nav-btn:hover .material-symbols-outlined {
+      color: var(--color-accent);
+    }
+
+    .nav-btn.is-active {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #b85a1a 100%);
+      color: #fff;
+      box-shadow: var(--shadow-card);
+    }
+
+    .nav-btn.is-active .material-symbols-outlined {
+      color: #fff;
+    }
+
+    /* Main */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-width: 0;
+      padding: 32px 40px 48px;
+    }
+
+    .panel {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .panel.is-visible {
+      display: block;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Home */
+    .home-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .home-logo {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--color-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .home-tagline {
+      margin-top: 8px;
+      font-size: 1rem;
+      color: var(--color-text-muted);
+    }
+
+    .search-block {
+      background: var(--color-container);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 28px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 16px 18px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      border: 2px solid rgba(150, 67, 0, 0.2);
+      border-radius: 14px;
+      background: #fff;
+      color: var(--color-text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(249, 135, 62, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    .search-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-send {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--color-accent) 0%, #e86a20 100%);
+      color: #fff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(249, 135, 62, 0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn-send:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(249, 135, 62, 0.45);
+    }
+
+    .chat-section-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      margin-bottom: 16px;
+    }
+
+    .chat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bubble {
+      max-width: 85%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      box-shadow: var(--shadow-card);
+    }
+
+    .bubble-user {
+      align-self: flex-end;
+      margin-left: auto;
+      background: linear-gradient(135deg, #5c5e5e 0%, var(--color-text) 100%);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble-ai {
+      align-self: flex-start;
+      background: linear-gradient(145deg, #ffb366 0%, var(--color-accent) 45%, var(--color-primary) 100%);
+      color: #fff;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble-wrap {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bubble-wrap.user { align-items: flex-end; }
+    .bubble-wrap.ai { align-items: flex-start; }
+
+    /* Restaurant page */
+    .page-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-title {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.75rem;
+      color: var(--color-primary);
+      margin: 0;
+    }
+
+    .filter-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px 0 20px;
+      margin: 0 -4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-accent) transparent;
+    }
+
+    .filter-scroll::-webkit-scrollbar { height: 6px; }
+    .filter-scroll::-webkit-scrollbar-thumb {
+      background: rgba(249, 135, 62, 0.5);
+      border-radius: 3px;
+    }
+
+    .filter-chip {
+      flex-shrink: 0;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(150, 67, 0, 0.25);
+      background: #fff;
+      color: var(--color-text);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip:hover,
+    .filter-chip.is-active {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 1100px) {
+      .restaurant-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .restaurant-grid { grid-template-columns: 1fr; }
+      .main { padding: 24px 20px; }
+    }
+
+    .rest-card {
+      border-radius: var(--radius-card);
+      padding: 20px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rest-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(45, 47, 47, 0.18);
+    }
+
+    .rest-card-g1 { background: linear-gradient(135deg, #7a3a00 0%, var(--color-accent) 100%); }
+    .rest-card-g2 { background: linear-gradient(200deg, var(--color-primary) 0%, #d4a574 100%); }
+    .rest-card-g3 { background: linear-gradient(160deg, #c45c12 0%, #f9873e 60%, #ffd4a8 100%); }
+    .rest-card-g4 { background: linear-gradient(90deg, #5c2d00 0%, var(--color-accent) 90%); }
+    .rest-card-g5 { background: linear-gradient(45deg, var(--color-accent) 0%, var(--color-primary) 100%); }
+    .rest-card-g6 { background: linear-gradient(220deg, #8b4510 0%, #e8a060 50%, #f9873e 100%); }
+
+    .rest-canteen {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 6px;
+    }
+
+    .rest-window {
+      font-family: var(--font-heading);
+      font-weight: 800;
+      font-size: 1.35rem;
+      color: #fff;
+      margin: 0 0 10px;
+      line-height: 1.25;
+    }
+
+    .rest-dish {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 14px;
+      flex: 1;
+    }
+
+    .rest-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 48px;
+    }
+
+    .rest-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(4px);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .rest-detail-btn {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--color-primary);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    .rest-detail-btn:hover {
+      background: #fff;
+    }
+
+    /* Posts */
+    .posts-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .btn-post-top {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--color-accent), #e86a20);
+      color: #fff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(249, 135, 62, 0.35);
+    }
+
+    .btn-post-top:hover {
+      filter: brightness(1.05);
+    }
+
+    .masonry {
+      column-count: 2;
+      column-gap: 20px;
+    }
+
+    .post-card {
+      break-inside: avoid;
+      margin-bottom: 20px;
+      border-radius: var(--radius-card);
+      background: #fff;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .post-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .post-img {
+      width: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .post-img-g1 { background-image: linear-gradient(160deg, #964300 0%, #f9873e 100%); }
+    .post-img-g2 { background-image: linear-gradient(45deg, #c45c12, #ffd4a8); }
+    .post-img-g3 { background-image: linear-gradient(200deg, #5c2d00, var(--color-accent)); }
+    .post-img-g4 { background-image: linear-gradient(120deg, var(--color-accent), #006b1b); }
+    .post-img-g5 { background-image: linear-gradient(90deg, #8b4510, #f9873e); }
+    .post-img-g6 { background-image: linear-gradient(180deg, #2d2f2f, var(--color-primary)); }
+    .post-img-g7 { background-image: linear-gradient(135deg, #f9873e, #e7e8e8); }
+    .post-img-g8 { background-image: linear-gradient(220deg, var(--color-primary), #ffb366); }
+
+    .post-body {
+      padding: 14px 16px 16px;
+    }
+
+    .post-excerpt {
+      font-size: 0.9rem;
+      color: var(--color-text);
+      margin: 0 0 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--color-text-muted);
+    }
+
+    .post-tag-inline {
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(249, 135, 62, 0.15);
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    .fab-post {
+      position: fixed;
+      right: 32px;
+      bottom: 32px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(145deg, var(--color-accent), var(--color-primary));
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(150, 67, 0, 0.4);
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .fab-post .material-symbols-outlined {
+      font-size: 28px;
+    }
+
+    .fab-post:hover {
+      transform: scale(1.06);
+    }
+
+    /* Modal - General Styles */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 27, 26, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal {
+      background: #fdf8f5;
+      border-radius: 2.5rem;
+      width: 100%;
+      max-width: 1152px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: flex;
+      transform: scale(0.9);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-backdrop.is-open .modal {
+      transform: scale(1);
+    }
+
+    .modal-close-global {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      color: white;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background 0.2s;
+      z-index: 210;
+    }
+
+    .modal-close-global:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Post Detail Modal Specifics */
+    .post-detail-modal-left {
+      width: 50%;
+      position: relative;
+    }
+
+    .post-detail-modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .post-detail-modal-right {
+      width: 50%;
+      padding: 48px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .post-detail-tags {
+      display: flex;
+      gap: 8px;
+    }
+
+    .post-detail-tag {
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-highlight { background-color: #ffdbcb; color: #76330c; }
+    .tag-location { background-color: #f2edea; color: #54433b; }
+
+    .post-detail-date {
+      color: var(--color-text-muted);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .post-detail-title {
+      font-family: var(--font-heading);
+      font-size: 2.25rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--color-text);
+      margin-bottom: 32px;
+    }
+
+    .post-detail-quote {
+      position: relative;
+      padding-left: 24px;
+      border-left: 4px solid var(--color-accent);
+      margin-bottom: 32px;
+    }
+
+    .post-detail-quote-text {
+      font-size: 1.25rem;
+      font-style: italic;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+    }
+
+    .post-detail-content {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--color-text-muted);
+    }
+
+    .post-detail-content p {
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 1024px) {
+      .modal { flex-direction: column; max-width: 600px; }
+      .post-detail-modal-left, .post-detail-modal-right { width: 100%; }
+      .post-detail-modal-left { height: 350px; }
+      .post-detail-modal-right { padding: 32px; }
+    }
+
+    /* Original Small Modal (Rest Detail) styling fallback or adjustments if needed */
+    .modal-small {
+      background: var(--color-container);
+      border-radius: var(--radius-card);
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+      position: relative;
+      padding: 0;
+    }
+    
+    .modal-small .modal-hero {
+      height: 120px;
+      border-radius: var(--radius-card) var(--radius-card) 0 0;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    }
+    
+    .modal-small .modal-content { padding: 24px 24px 28px; }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--color-text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="sidebar-brand">食记</div>
+<div class="sidebar-sub">今天吃什么，让AI帮你决定</div>
+<ul class="nav-list">
+<li class="nav-item">
+<button aria-current="page" class="nav-btn is-active" data-panel="home" type="button">
+<span class="material-symbols-outlined">home</span>
+            首页
+          </button>
+</li>
+<li class="nav-item">
+<button class="nav-btn" data-panel="restaurant" type="button">
+<span class="material-symbols-outlined">restaurant</span>
+            餐厅
+          </button>
+</li>
+<li class="nav-item">
+<button class="nav-btn" data-panel="posts" type="button">
+<span class="material-symbols-outlined">forum</span>
+            帖子
+          </button>
+</li>
+</ul>
+</aside>
+<main class="main">
+<!-- 首页 -->
+<section aria-label="首页" class="panel panel-home is-visible" id="panel-home">
+<div class="home-header">
+<div class="home-logo">食记</div>
+<p class="home-tagline">今天吃什么，让AI帮你决定</p>
+</div>
+<div class="search-block">
+<div class="search-input-wrap">
+<input autocomplete="off" class="search-input" id="searchInput" placeholder="告诉我你想吃什么..." type="text"/>
+</div>
+<div class="search-actions">
+<button class="btn-send" id="btnSend" type="button">
+<span class="material-symbols-outlined">send</span>
+              发送
+            </button>
+</div>
+</div>
+<p class="chat-section-title">AI 对话</p>
+<div class="chat-list" id="chatList">
+<div class="bubble-wrap user">
+<div class="bubble bubble-user">我想吃辣的，快一点的</div>
+</div>
+<div class="bubble-wrap ai">
+<div class="bubble bubble-ai">推荐你去一食堂三楼7号窗口，黑椒鸡排饭，出餐快量大，很多同学都说值得排队！</div>
+</div>
+<div class="bubble-wrap user">
+<div class="bubble bubble-user">有没有清淡一点的湯面？</div>
+</div>
+<div class="bubble-wrap ai">
+<div class="bubble bubble-ai">二食堂一楼3号窗口的菌菇鸡汤面很受欢迎，汤清味鲜，适合想吃得舒服一点的同学。</div>
+</div>
+</div>
+</section>
+<!-- 餐厅 -->
+<section aria-label="校园餐厅" class="panel panel-restaurant" hidden="" id="panel-restaurant">
+<div class="page-head">
+<h1 class="page-title">校园餐厅</h1>
+</div>
+<div aria-label="筛选" class="filter-scroll" role="tablist">
+<button class="filter-chip is-active" data-filter="all" type="button">全部</button>
+<button class="filter-chip" data-filter="c1" type="button">一食堂</button>
+<button class="filter-chip" data-filter="c2" type="button">二食堂</button>
+<button class="filter-chip" data-filter="c3" type="button">三食堂</button>
+<button class="filter-chip" data-filter="big" type="button">量大</button>
+<button class="filter-chip" data-filter="cheap" type="button">便宜</button>
+<button class="filter-chip" data-filter="fast" type="button">出餐快</button>
+</div>
+<div class="restaurant-grid">
+<article class="rest-card rest-card-g1" data-author1="小陈" data-author2="阿杰" data-canteen="一食堂 · 三楼" data-dish="黑椒鸡排饭" data-id="1" data-rev1="出餐真的快，下课冲过去五分钟拿到。" data-rev2="辣度刚好，分量男生也够吃。" data-window="7号窗口 · 黑椒鸡排">
+<div class="rest-canteen">一食堂 · 三楼</div>
+<h2 class="rest-window">7号窗口</h2>
+<p class="rest-dish">推荐：黑椒鸡排饭</p>
+<div class="rest-tags">
+<span class="rest-tag">出餐快</span>
+<span class="rest-tag">量大</span>
+<span class="rest-tag">微辣</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+<article class="rest-card rest-card-g2" data-author1="林同学" data-author2="匿名用户" data-canteen="二食堂 · 一楼" data-dish="菌菇鸡汤面" data-id="2" data-rev1="汤很鲜，面条劲道，冬天来一碗很舒服。" data-rev2="排队略久但值得，清淡不腻。" data-window="3号窗口 · 菌菇鸡汤面">
+<div class="rest-canteen">二食堂 · 一楼</div>
+<h2 class="rest-window">3号窗口</h2>
+<p class="rest-dish">推荐：菌菇鸡汤面</p>
+<div class="rest-tags">
+<span class="rest-tag">清淡</span>
+<span class="rest-tag">便宜</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+<article class="rest-card rest-card-g3" data-author1="辣妹本妹" data-author2="理工男" data-canteen="三食堂 · 二楼" data-dish="自选麻辣香锅" data-id="3" data-rev1="可以自己选菜，辣度自由，人均不高。" data-rev2="高峰期要等一会，但味道很上头。" data-window="12号窗口 · 麻辣香锅">
+<div class="rest-canteen">三食堂 · 二楼</div>
+<h2 class="rest-window">12号窗口</h2>
+<p class="rest-dish">推荐：自选麻辣香锅</p>
+<div class="rest-tags">
+<span class="rest-tag">便宜</span>
+<span class="rest-tag">辣</span>
+<span class="rest-tag">自选</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+<article class="rest-card rest-card-g4" data-author1="甜甜" data-author2="考研党" data-canteen="一食堂 · 二楼" data-dish="照烧鸡腿饭" data-id="4" data-rev1="甜咸口爱好者狂喜，鸡腿肉很嫩。" data-rev2="出餐速度中等，建议错峰。" data-window="5号窗口 · 照烧鸡腿饭">
+<div class="rest-canteen">一食堂 · 二楼</div>
+<h2 class="rest-window">5号窗口</h2>
+<p class="rest-dish">推荐：照烧鸡腿饭</p>
+<div class="rest-tags">
+<span class="rest-tag">量大</span>
+<span class="rest-tag">照烧</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+<article class="rest-card rest-card-g5" data-author1="番茄控" data-author2="省钱小能手" data-canteen="二食堂 · 三楼" data-dish="番茄牛肉饭" data-id="5" data-rev1="番茄味浓，牛肉片给得实在。" data-rev2="性价比高，女生一份吃很饱。" data-window="8号窗口 · 番茄牛肉饭">
+<div class="rest-canteen">二食堂 · 三楼</div>
+<h2 class="rest-window">8号窗口</h2>
+<p class="rest-dish">推荐：番茄牛肉饭</p>
+<div class="rest-tags">
+<span class="rest-tag">便宜</span>
+<span class="rest-tag">酸甜</span>
+<span class="rest-tag">出餐快</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+<article class="rest-card rest-card-g6" data-author1="老广" data-author2="吃货联盟" data-canteen="三食堂 · 一楼" data-dish="烧鸭饭" data-id="6" data-rev1="皮脆肉香，蘸梅子酱一绝。" data-rev2="略贵但品质在线，偶尔犒劳自己。" data-window="2号窗口 · 广式烧腊">
+<div class="rest-canteen">三食堂 · 一楼</div>
+<h2 class="rest-window">2号窗口</h2>
+<p class="rest-dish">推荐：烧鸭饭</p>
+<div class="rest-tags">
+<span class="rest-tag">量大</span>
+<span class="rest-tag">烧腊</span>
+</div>
+<button class="rest-detail-btn" type="button">查看详情</button>
+</article>
+</div>
+</section>
+<!-- 帖子 -->
+<section aria-label="同学说" class="panel panel-posts" hidden="" id="panel-posts">
+<div class="posts-head">
+<h1 class="page-title">同学说</h1>
+<button class="btn-post-top" id="btnPostTop" type="button">发帖</button>
+</div>
+<div class="masonry">
+<article class="post-card" data-content="今天特意去了大家都在传的一食堂一号窗口。果然名不虚传，红烧面的汤底是那种熬制了很久的浓稠感，牛肉块也给得很足，软烂入味。价格非常亲民，在这个物价上涨的年代，这一碗只要12块钱，简直是学生党的福音。" data-date="2026-03-26" data-img-class="post-img-g1" data-location="一食堂" data-quote="面条劲道，汤底醇厚，满满的都是家乡的味道。" data-tag="同学推荐" data-title="一食堂一号窗口推荐：红烧面真的好吃">
+<div aria-label="配图占位" class="post-img post-img-g1" role="img" style="height: 142px"></div>
+<div class="post-body">
+<p class="post-excerpt">一食堂新出的窗口排队好长，但黑椒鸡排真的值得，下课冲！</p>
+<div class="post-meta">
+<span class="post-tag-inline">种草</span>
+<time datetime="2026-03-26">2026-03-26</time>
+</div>
+</div>
+</article>
+<article class="post-card" data-content="菌菇鸡汤面，冷天喝一口整个人都活了。汤清味鲜，适合想吃得舒服一点的同学。排队略久但值得，清淡不腻。" data-date="2026-03-25" data-img-class="post-img-g2" data-location="二食堂" data-quote="汤很鲜，面条劲道，冬天来一碗很舒服。" data-tag="暖冬推荐" data-title="二食堂汤面窗口的暖心推荐">
+<div aria-label="配图占位" class="post-img post-img-g2" role="img" style="height: 176px"></div>
+<div class="post-body">
+<p class="post-excerpt">二食堂汤面窗口的菌菇鸡汤面，冷天喝一口整个人都活了。</p>
+<div class="post-meta">
+<span class="post-tag-inline">汤面</span>
+<time datetime="2026-03-25">2026-03-25</time>
+</div>
+</div>
+</article>
+<!-- Simplified data attributes for remaining cards -->
+<article class="post-card" data-content="麻辣香锅确实下饭，但是那里的油真的很大。如果是下午有重要课程或者考试的同学，建议避开，否则油腻感会让你非常困倦。" data-date="2026-03-24" data-img-class="post-img-g3" data-location="三食堂" data-quote="记得少油，不然下午课会困……别问我怎么知道的。" data-tag="避雷提示" data-title="三食堂麻辣香锅避雷提示">
+<div aria-label="配图占位" class="post-img post-img-g3" role="img" style="height: 128px"></div>
+<div class="post-body">
+<p class="post-excerpt">三食堂麻辣香锅记得少油，不然下午课会困……别问我怎么知道的。</p>
+<div class="post-meta">
+<span class="post-tag-inline">避雷提示</span>
+<time datetime="2026-03-24">2026-03-24</time>
+</div>
+</div>
+</article>
+<article class="post-card" data-content="图书馆附近能快速打包的窗口，求各位大神推荐。最近赶论文，实在没时间在食堂排长队坐着吃。" data-date="2026-03-23" data-img-class="post-img-g4" data-location="全校" data-quote="午休时间太短了，有没有能快速打包的窗口？" data-tag="求助" data-title="寻找图书馆周边的快速简餐">
+<div aria-label="配图占位" class="post-img post-img-g4" role="img" style="height: 168px"></div>
+<div class="post-body">
+<p class="post-excerpt">求推荐：图书馆附近能快速打包的窗口，午休时间太短了。</p>
+<div class="post-meta">
+<span class="post-tag-inline">求助</span>
+<time datetime="2026-03-23">2026-03-23</time>
+</div>
+</div>
+</article>
+<article class="post-card" data-content="照烧鸡腿饭的酱汁调得非常到位，鸡腿肉鲜嫩多汁。本来以为这种偏甜的口味我不会喜欢，没想到完全被圈粉了。" data-date="2026-03-22" data-img-class="post-img-g5" data-location="一食堂" data-quote="甜度刚好，本北方人表示可以接受，会回购。" data-tag="好吃推荐" data-title="照烧鸡腿饭：北方人也爱吃">
+<div aria-label="配图占位" class="post-img post-img-g5" role="img" style="height: 154px"></div>
+<div class="post-body">
+<p class="post-excerpt">照烧鸡腿饭甜度刚好，本北方人表示可以接受，会回购。</p>
+<div class="post-meta">
+<span class="post-tag-inline">照烧</span>
+<time datetime="2026-03-22">2026-03-22</time>
+</div>
+</div>
+</article>
+<article class="post-card" data-content="番茄牛肉饭性价比拉满，牛肉片给得很大方。汤汁拌饭真的绝绝子，一顿下来只要十来块钱，太划算了。" data-date="2026-03-21" data-img-class="post-img-g6" data-location="二食堂" data-quote="十块钱出头还要什么自行车。" data-tag="性价比" data-title="番茄牛肉饭：省钱之选">
+<div aria-label="配图占位" class="post-img post-img-g6" role="img" style="height: 120px"></div>
+<div class="post-body">
+<p class="post-excerpt">番茄牛肉饭性价比拉满，十块钱出头还要什么自行车。</p>
+<div class="post-meta">
+<span class="post-tag-inline">性价比</span>
+<time datetime="2026-03-21">2026-03-21</time>
+</div>
+</div>
+</article>
+</div>
+<button aria-label="发帖" class="fab-post" id="fabPost" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</section>
+</main>
+</div>
+<!-- 模态框统一容器 -->
+<div aria-modal="true" class="modal-backdrop" id="modalBackdrop" role="dialog">
+<!-- 全局关闭按钮 (Top Right) -->
+<button aria-label="关闭" class="modal-close-global" id="modalCloseGlobal" type="button">
+<span class="material-symbols-outlined" style="font-size: 40px;">close</span>
+</button>
+<!-- 餐厅详情模态框 (Small) -->
+<div class="modal modal-small" id="restModal" style="display:none;">
+<button aria-label="关闭" class="modal-close-btn" id="restModalClose" type="button">
+<span class="material-symbols-outlined">close</span>
+</button>
+<div class="modal-hero" id="modalHero"></div>
+<div class="modal-content">
+<h2 class="modal-window" id="modalWindowTitle"></h2>
+<p class="modal-canteen" id="modalCanteen"></p>
+<div class="modal-dish" id="modalDishWrap">
+<strong>推荐菜品</strong>
+<span id="modalDish"></span>
+</div>
+<p class="modal-reviews-title">同学评价</p>
+<div id="modalReviews"></div>
+</div>
+</div>
+<!-- 帖子详情模态框 (Large Detailed - Match SCREEN_8) -->
+<div class="modal" id="postModal" style="display:none;">
+<div class="post-detail-modal-left">
+<div class="w-full h-full" id="postModalImage"></div>
+</div>
+<div class="post-detail-modal-right">
+<div class="post-detail-header">
+<div class="post-detail-tags">
+<span class="post-detail-tag tag-highlight" id="postModalTag"></span>
+<span class="post-detail-tag tag-location" id="postModalLocation"></span>
+</div>
+<div class="post-detail-date" id="postModalDate"></div>
+</div>
+<h1 class="post-detail-title" id="postModalTitle"></h1>
+<div class="post-detail-quote">
+<p class="post-detail-quote-text" id="postModalQuote"></p>
+</div>
+<div class="post-detail-content" id="postModalContent"></div>
+</div>
+</div>
+</div>
+<script>
+    (function () {
+      var panels = {
+        home: document.getElementById("panel-home"),
+        restaurant: document.getElementById("panel-restaurant"),
+        posts: document.getElementById("panel-posts")
+      };
+      var navBtns = document.querySelectorAll(".nav-btn[data-panel]");
+      var chatList = document.getElementById("chatList");
+      var searchInput = document.getElementById("searchInput");
+      var btnSend = document.getElementById("btnSend");
+      
+      var modalBackdrop = document.getElementById("modalBackdrop");
+      var modalCloseGlobal = document.getElementById("modalCloseGlobal");
+      
+      // Restaurant Modal Elements
+      var restModal = document.getElementById("restModal");
+      var restModalClose = document.getElementById("restModalClose");
+      var modalWindowTitle = document.getElementById("modalWindowTitle");
+      var modalCanteen = document.getElementById("modalCanteen");
+      var modalDish = document.getElementById("modalDish");
+      var modalReviews = document.getElementById("modalReviews");
+
+      // Post Modal Elements
+      var postModal = document.getElementById("postModal");
+      var postModalImage = document.getElementById("postModalImage");
+      var postModalTag = document.getElementById("postModalTag");
+      var postModalLocation = document.getElementById("postModalLocation");
+      var postModalDate = document.getElementById("postModalDate");
+      var postModalTitle = document.getElementById("postModalTitle");
+      var postModalQuote = document.getElementById("postModalQuote");
+      var postModalContent = document.getElementById("postModalContent");
+
+      var fabPost = document.getElementById("fabPost");
+      var btnPostTop = document.getElementById("btnPostTop");
+
+      var AI_REPLY = "根据你的描述，推荐试试二食堂三楼新开的窗口，出餐快、口味选择多，很多同学反馈性价比很高！";
+
+      function showPanel(name) {
+        Object.keys(panels).forEach(function (key) {
+          var el = panels[key];
+          if (key === name) {
+            el.classList.add("is-visible");
+            el.removeAttribute("hidden");
+          } else {
+            el.classList.remove("is-visible");
+            el.setAttribute("hidden", "");
+          }
+        });
+        navBtns.forEach(function (btn) {
+          var active = btn.getAttribute("data-panel") === name;
+          btn.classList.toggle("is-active", active);
+          if (active) btn.setAttribute("aria-current", "page");
+          else btn.removeAttribute("aria-current");
+        });
+      }
+
+      navBtns.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          showPanel(btn.getAttribute("data-panel"));
+        });
+      });
+
+      function appendChat(userText, aiText) {
+        var userWrap = document.createElement("div");
+        userWrap.className = "bubble-wrap user";
+        userWrap.innerHTML = '<div class="bubble bubble-user"></div>';
+        userWrap.querySelector(".bubble-user").textContent = userText;
+
+        var aiWrap = document.createElement("div");
+        aiWrap.className = "bubble-wrap ai";
+        aiWrap.innerHTML = '<div class="bubble bubble-ai"></div>';
+        aiWrap.querySelector(".bubble-ai").textContent = aiText;
+
+        chatList.appendChild(userWrap);
+        chatList.appendChild(aiWrap);
+        userWrap.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+
+      function handleSend() {
+        var text = (searchInput.value || "").trim();
+        if (!text) return;
+        appendChat(text, AI_REPLY);
+        searchInput.value = "";
+      }
+
+      btnSend.addEventListener("click", handleSend);
+      searchInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          handleSend();
+        }
+      });
+
+      function openRestModal(card) {
+        modalWindowTitle.textContent = card.getAttribute("data-window") || "";
+        modalCanteen.textContent = card.getAttribute("data-canteen") || "";
+        modalDish.textContent = card.getAttribute("data-dish") || "";
+
+        var a1 = card.getAttribute("data-author1") || "同学";
+        var a2 = card.getAttribute("data-author2") || "同学";
+        var r1 = card.getAttribute("data-rev1") || "";
+        var r2 = card.getAttribute("data-rev2") || "";
+
+        modalReviews.innerHTML =
+          '<div class="review-item"><div class="review-author">' +
+          escapeHtml(a1) +
+          '</div><div class="review-text">' +
+          escapeHtml(r1) +
+          "</div></div>" +
+          '<div class="review-item"><div class="review-author">' +
+          escapeHtml(a2) +
+          '</div><div class="review-text">' +
+          escapeHtml(r2) +
+          "</div></div>";
+
+        restModal.style.display = "block";
+        postModal.style.display = "none";
+        modalBackdrop.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function openPostModal(card) {
+        postModalTitle.textContent = card.dataset.title;
+        postModalTag.textContent = card.dataset.tag;
+        postModalLocation.textContent = card.dataset.location;
+        postModalDate.textContent = card.dataset.date;
+        postModalQuote.textContent = '"' + card.dataset.quote + '"';
+        postModalContent.innerHTML = '<p>' + card.dataset.content.replace(/\n/g, '</p><p>') + '</p>';
+        
+        // Match the image style of the card
+        postModalImage.className = "post-detail-modal-image " + card.dataset.imgClass;
+
+        postModal.style.display = "flex";
+        restModal.style.display = "none";
+        modalBackdrop.classList.add("is-open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function escapeHtml(s) {
+        var div = document.createElement("div");
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function closeModal() {
+        modalBackdrop.classList.remove("is-open");
+        document.body.style.overflow = "";
+        // Clean up display after transition
+        setTimeout(() => {
+            if (!modalBackdrop.classList.contains('is-open')) {
+                restModal.style.display = "none";
+                postModal.style.display = "none";
+            }
+        }, 300);
+      }
+
+      document.querySelectorAll(".rest-card").forEach(function (card) {
+        card.addEventListener("click", function (e) {
+          openRestModal(card);
+        });
+      });
+
+      document.querySelectorAll(".post-card").forEach(function (card) {
+        card.addEventListener("click", function (e) {
+          openPostModal(card);
+        });
+      });
+
+      modalCloseGlobal.addEventListener("click", closeModal);
+      restModalClose.addEventListener("click", closeModal);
+      
+      modalBackdrop.addEventListener("click", function (e) {
+        if (e.target === modalBackdrop) closeModal();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && modalBackdrop.classList.contains("is-open")) {
+          closeModal();
+        }
+      });
+
+      function toast(msg) {
+        alert(msg);
+      }
+
+      fabPost.addEventListener("click", function () {
+        toast("发帖功能为展示用，未连接后端。");
+      });
+      btnPostTop.addEventListener("click", function () {
+        toast("发帖功能为展示用，未连接后端。");
+      });
+
+      document.querySelectorAll(".filter-chip").forEach(function (chip) {
+        chip.addEventListener("click", function () {
+          document.querySelectorAll(".filter-chip").forEach(function (c) {
+            c.classList.remove("is-active");
+          });
+          chip.classList.add("is-active");
+        });
+      });
+    })();
+  </script>
+</body></html>
